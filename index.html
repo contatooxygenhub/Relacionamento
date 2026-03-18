@@ -247,15 +247,22 @@ document.addEventListener('DOMContentLoaded', function () {
   // ── 1. ENVIO DO FORMULÁRIO → generate_lead ───────────────
   // Captura clique no botão de submit
   var btnSubmit = document.querySelector('.btn-submit');
-  if (btnSubmit) {
-    btnSubmit.addEventListener('click', function () {
-      gtag('event', 'generate_lead', {
-        event_category: 'form',
-        event_label: 'landing_relacionamentos',
-        campaign: 'era_da_solidao'
-      });
+if (btnSubmit) {
+  btnSubmit.addEventListener('click', function (e) {
+    e.preventDefault();
+    gtag('event', 'generate_lead', {
+      event_category: 'form',
+      event_label: 'landing_relacionamentos',
+      campaign: 'era_da_solidao',
+      'event_callback': function() {
+        btnSubmit.closest('form').submit();
+      }
     });
-  }
+    setTimeout(function() {
+      btnSubmit.closest('form').submit();
+    }, 500);
+  });
+}
 
   // ── 2. CLIQUE NO BOTÃO DE PLANOS → click_plans ───────────
   // Usa delegação porque o .btn-club só aparece após o form
