@@ -246,21 +246,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // ── 1. ENVIO DO FORMULÁRIO → generate_lead ───────────────
   // Captura clique no botão de submit
-  var btnSubmit = document.querySelector('.btn-submit');
+var btnSubmit = document.querySelector('.btn-submit');
 if (btnSubmit) {
-  btnSubmit.addEventListener('click', function (e) {
-    e.preventDefault();
+  btnSubmit.addEventListener('click', function () {
     gtag('event', 'generate_lead', {
       event_category: 'form',
       event_label: 'landing_relacionamentos',
-      campaign: 'era_da_solidao',
-      'event_callback': function() {
-        btnSubmit.closest('form').submit();
-      }
+      campaign: 'era_da_solidao'
     });
-    setTimeout(function() {
-      btnSubmit.closest('form').submit();
-    }, 500);
   });
 }
 
