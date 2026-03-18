@@ -156,7 +156,7 @@
       <p class="video-eyebrow">Assista à aula</p>
       <h2 class="video-heading">Relacionamentos na Era da Solidão</h2>
       <div class="video-wrapper">
-        <iframe src="https://www.youtube.com/embed/VPtoPGkVFmk" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <iframe src="https://www.youtube.com/embed/VPtoPGkVFmk?enablejsapi=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
       </div>
     </div>
 
@@ -235,4 +235,105 @@
 </script>
 
 </body>
+  <script>
+// ============================================================
+// TRACKING GA4 — Oxygen Relacionamentos
+// Eventos: generate_lead | click_plans | video (25/50/75/100%)
+// Destino: direto GA4 G-HPE01YPWMH — sem GTM
+// ============================================================
+
+document.addEventListener('DOMContentLoaded', function () {
+
+  // ── 1. ENVIO DO FORMULÁRIO → generate_lead ───────────────
+  // Captura clique no botão de submit
+  var btnSubmit = document.querySelector('.btn-submit');
+  if (btnSubmit) {
+    btnSubmit.addEventListener('click', function () {
+      gtag('event', 'generate_lead', {
+        event_category: 'form',
+        event_label: 'landing_relacionamentos',
+        campaign: 'era_da_solidao'
+      });
+    });
+  }
+
+  // ── 2. CLIQUE NO BOTÃO DE PLANOS → click_plans ───────────
+  // Usa delegação porque o .btn-club só aparece após o form
+  document.body.addEventListener('click', function (e) {
+    var target = e.target.closest('.btn-club');
+    if (target) {
+      gtag('event', 'click_plans', {
+        event_category: 'engagement',
+        event_label: 'cta_oxygen_club',
+        campaign: 'era_da_solidao'
+      });
+    }
+  });
+
+  // ── 3. VÍDEO YOUTUBE — marcos 25% / 50% / 75% / 100% ─────
+  // Carrega a YouTube IFrame API oficialmente
+  var ytScript = document.createElement('script');
+  ytScript.src = 'https://www.youtube.com/iframe_api';
+  document.head.appendChild(ytScript);
+});
+
+// Callback obrigatório da YouTube IFrame API
+var ytPlayer;
+function onYouTubeIframeAPIReady() {
+  var iframe = document.querySelector('.video-wrapper iframe');
+  if (!iframe) return;
+
+  // Extrai o video ID da src do iframe
+  var match = iframe.src.match(/embed\/([^?&"'>]+)/);
+  if (!match) return;
+  var videoId = match[1];
+
+  // Substitui o iframe pelo player controlado pela API
+  var placeholder = document.createElement('div');
+  placeholder.id = 'yt-oxygen-player';
+  iframe.parentNode.replaceChild(placeholder, iframe);
+
+  ytPlayer = new YT.Player('yt-oxygen-player', {
+    videoId: videoId,
+    playerVars: { rel: 0, modestbranding: 1, enablejsapi: 1 },
+    events: {
+      onStateChange: function (e) {
+        // Inicia o monitoramento de marcos quando o vídeo começa
+        if (e.data === YT.PlayerState.PLAYING && !ytPlayer._interval) {
+          ytPlayer._milestones = { 25: false, 50: false, 75: false, 100: false };
+
+          ytPlayer._interval = setInterval(function () {
+            var duration = ytPlayer.getDuration();
+            if (!duration) return;
+
+            var pct = Math.floor((ytPlayer.getCurrentTime() / duration) * 100);
+
+            [25, 50, 75, 100].forEach(function (marco) {
+              if (pct >= marco && !ytPlayer._milestones[marco]) {
+                ytPlayer._milestones[marco] = true;
+                gtag('event', 'video_progress', {
+                  event_category: 'video',
+                  event_label: 'era_da_solidao',
+                  video_percent: marco,
+                  video_id: videoId
+                });
+                // Para o interval quando completa 100%
+                if (marco === 100) clearInterval(ytPlayer._interval);
+              }
+            });
+          }, 1000); // verifica a cada 1 segundo
+        }
+
+        // Pausa o interval se o usuário pausar ou o vídeo acabar
+        if (e.data === YT.PlayerState.PAUSED || e.data === YT.PlayerState.ENDED) {
+          if (ytPlayer._interval) {
+            clearInterval(ytPlayer._interval);
+            ytPlayer._interval = null;
+          }
+        }
+      }
+    }
+  });
+}
+</script>
 </html>
