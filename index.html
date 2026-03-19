@@ -265,7 +265,17 @@ if (btnSubmit) {
     }
   });
 
-  // ── 3. VÍDEO YOUTUBE — marcos 25% / 50% / 75% / 100% ─────
+    // ── 3. CLIQUE NO VÍDEO — captura inline e redirecionamento YT (NOVO)
+  var iframe = document.querySelector('.video-wrapper iframe');
+  if (iframe) {
+    iframe.addEventListener('click', function () {
+      gtag('event', 'video_start', {
+        event_category: 'video',
+        event_label: 'era_da_solidao_relacionamentos'
+      });
+    });
+  }
+  // ── 4. VÍDEO YOUTUBE — marcos 25% / 50% / 75% / 100% ─────
   // Carrega a YouTube IFrame API oficialmente
   var ytScript = document.createElement('script');
   ytScript.src = 'https://www.youtube.com/iframe_api';
