@@ -192,19 +192,16 @@
 
   document.getElementById('lead-form').addEventListener('submit', function(e) {
   e.preventDefault();
-  // ... resto do código
-    e.preventDefault();
-    var btn = document.getElementById('btn-submit');
-    btn.disabled = true;
-    btn.textContent = 'Enviando...';
-
-    var formData = new FormData(this);
-    var payload = {
-  nome: formData.get('nome'),
-  email: formData.get('email'),
-  telefone: formData.get('telefone'),
-  token: formData.get('token')
-};
+  var btn = document.getElementById('btn-submit');
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+  var formData = new FormData(this);
+  var payload = {
+    nome: formData.get('nome'),
+    email: formData.get('email'),
+    telefone: formData.get('telefone'),
+    token: formData.get('token')
+  };
 
     fetch('https://script.google.com/macros/s/AKfycbwiTKHAkO6g2Fjb88lBojOQ2-knQze9iFCMBy0HkM6zITx27VYodGmUMVGrUBBWhoToOA/exec', {
       method: 'POST',
