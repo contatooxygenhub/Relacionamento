@@ -129,7 +129,7 @@
           <label for="telefone">Telefone *</label>
           <input type="tel" id="telefone" name="telefone" placeholder="(11) 9 0000-0000" required>
         </div>
-        <input type="hidden" name="token" value="oxygen_relacionamentos_2025">
+        <input type="text" name="website" style="display:none !important;" tabindex="-1" autocomplete="off">
         <button type="submit" class="btn-submit" id="btn-submit">Acessar a aula gratuitamente</button>
         <p class="form-note">🔒 Prometemos não enviar spam.</p>
       </form>
@@ -243,9 +243,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // ── 1. ENVIO DO FORMULÁRIO → generate_lead ───────────────
   // Captura clique no botão de submit
+var formLoadTime = Date.now();
 var btnSubmit = document.querySelector('.btn-submit');
 if (btnSubmit) {
   btnSubmit.addEventListener('click', function () {
+    
+    // Honeypot — bot preencheu campo invisível
+    var honeypot = document.querySelector('[name="website"]');
+    if (honeypot && honeypot.value !== '') {
+      return; // é bot, ignora silenciosamente
+    }
+
+    // Tempo mínimo — bot preenche em menos de 3 segundos
+    if (Date.now() - formLoadTime < 3000) {
+      return; // é bot, ignora silenciosamente
+    }
+
     gtag('event', 'generate_lead', {
       event_category: 'form',
       event_label: 'landing_relacionamentos',
