@@ -191,6 +191,8 @@
   }
 
   document.getElementById('lead-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  // ... resto do código
     e.preventDefault();
     var btn = document.getElementById('btn-submit');
     btn.disabled = true;
