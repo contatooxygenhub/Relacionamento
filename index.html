@@ -200,11 +200,11 @@
 
     var formData = new FormData(this);
     var payload = {
-      nome: formData.get('nome'),
-      email: formData.get('email'),
-      telefone: formData.get('telefone')
-      token: formData.get('token')
-    };
+  nome: formData.get('nome'),
+  email: formData.get('email'),
+  telefone: formData.get('telefone'),
+  token: formData.get('token')
+};
 
     fetch('https://script.google.com/macros/s/AKfycbwiTKHAkO6g2Fjb88lBojOQ2-knQze9iFCMBy0HkM6zITx27VYodGmUMVGrUBBWhoToOA/exec', {
       method: 'POST',
