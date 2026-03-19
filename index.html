@@ -235,43 +235,31 @@
 </script>
 
 </body>
-  <script>
+<script>
 // ============================================================
 // TRACKING GA4 — Oxygen Relacionamentos
-// Eventos: generate_lead | click_plans | video (25/50/75/100%)
-// Destino: direto GA4 G-HPE01YPWMH — sem GTM
 // ============================================================
 
 document.addEventListener('DOMContentLoaded', function () {
 
-  // ── 1. ENVIO DO FORMULÁRIO → generate_lead ───────────────
-  // Captura clique no botão de submit
-var formLoadTime = Date.now();
-var btnSubmit = document.querySelector('.btn-submit');
-if (btnSubmit) {
-  btnSubmit.addEventListener('click', function () {
-    
-    // Honeypot — bot preencheu campo invisível
-    var honeypot = document.querySelector('[name="website"]');
-    if (honeypot && honeypot.value !== '') {
-      return; // é bot, ignora silenciosamente
-    }
+  var formLoadTime = Date.now();
 
-    // Tempo mínimo — bot preenche em menos de 3 segundos
-    if (Date.now() - formLoadTime < 3000) {
-      return; // é bot, ignora silenciosamente
-    }
-
-    gtag('event', 'generate_lead', {
-      event_category: 'form',
-      event_label: 'landing_relacionamentos',
-      campaign: 'era_da_solidao'
+  // ── 1. ENVIO DO FORMULÁRIO → generate_lead
+  var btnSubmit = document.querySelector('.btn-submit');
+  if (btnSubmit) {
+    btnSubmit.addEventListener('click', function () {
+      var honeypot = document.querySelector('[name="website"]');
+      if (honeypot && honeypot.value !== '') return;
+      if (Date.now() - formLoadTime < 3000) return;
+      gtag('event', 'generate_lead', {
+        event_category: 'form',
+        event_label: 'landing_relacionamentos',
+        campaign: 'era_da_solidao'
+      });
     });
-  });
-}
+  }
 
-  // ── 2. CLIQUE NO BOTÃO DE PLANOS → click_plans ───────────
-  // Usa delegação porque o .btn-club só aparece após o form
+  // ── 2. CLIQUE NO BOTÃO DE PLANOS
   document.body.addEventListener('click', function (e) {
     var target = e.target.closest('.btn-club');
     if (target) {
@@ -283,7 +271,7 @@ if (btnSubmit) {
     }
   });
 
-    // ── 3. CLIQUE NO VÍDEO — captura inline e redirecionamento YT (NOVO)
+  // ── 3. CLIQUE NO VÍDEO
   var iframe = document.querySelector('.video-wrapper iframe');
   if (iframe) {
     iframe.addEventListener('click', function () {
@@ -293,44 +281,36 @@ if (btnSubmit) {
       });
     });
   }
-  // ── 4. VÍDEO YOUTUBE — marcos 25% / 50% / 75% / 100% ─────
-  // Carrega a YouTube IFrame API oficialmente
+
+  // ── 4. YOUTUBE API
   var ytScript = document.createElement('script');
   ytScript.src = 'https://www.youtube.com/iframe_api';
   document.head.appendChild(ytScript);
+
 });
 
-// Callback obrigatório da YouTube IFrame API
+// Callback YouTube API
 var ytPlayer;
 function onYouTubeIframeAPIReady() {
   var iframe = document.querySelector('.video-wrapper iframe');
   if (!iframe) return;
-
-  // Extrai o video ID da src do iframe
   var match = iframe.src.match(/embed\/([^?&"'>]+)/);
   if (!match) return;
   var videoId = match[1];
-
-  // Substitui o iframe pelo player controlado pela API
   var placeholder = document.createElement('div');
   placeholder.id = 'yt-oxygen-player';
   iframe.parentNode.replaceChild(placeholder, iframe);
-
   ytPlayer = new YT.Player('yt-oxygen-player', {
     videoId: videoId,
     playerVars: { rel: 0, modestbranding: 1, enablejsapi: 1 },
     events: {
       onStateChange: function (e) {
-        // Inicia o monitoramento de marcos quando o vídeo começa
         if (e.data === YT.PlayerState.PLAYING && !ytPlayer._interval) {
           ytPlayer._milestones = { 25: false, 50: false, 75: false, 100: false };
-
           ytPlayer._interval = setInterval(function () {
             var duration = ytPlayer.getDuration();
             if (!duration) return;
-
             var pct = Math.floor((ytPlayer.getCurrentTime() / duration) * 100);
-
             [25, 50, 75, 100].forEach(function (marco) {
               if (pct >= marco && !ytPlayer._milestones[marco]) {
                 ytPlayer._milestones[marco] = true;
@@ -340,14 +320,11 @@ function onYouTubeIframeAPIReady() {
                   video_percent: marco,
                   video_id: videoId
                 });
-                // Para o interval quando completa 100%
                 if (marco === 100) clearInterval(ytPlayer._interval);
               }
             });
-          }, 1000); // verifica a cada 1 segundo
+          }, 1000);
         }
-
-        // Pausa o interval se o usuário pausar ou o vídeo acabar
         if (e.data === YT.PlayerState.PAUSED || e.data === YT.PlayerState.ENDED) {
           if (ytPlayer._interval) {
             clearInterval(ytPlayer._interval);
